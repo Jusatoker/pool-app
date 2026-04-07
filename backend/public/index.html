@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Freedom Pools Tennessee</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;background:#f0f4f8;color:#1a2332;min-height:100vh}
+
+    /* ── LANDING / LOGIN ── */
+    #landing{position:fixed;inset:0;background:linear-gradient(135deg,#0a1628 0%,#0d2847 40%,#1a4a7a 100%);display:flex;align-items:center;justify-content:center}
+    #landing::before{content:'';position:absolute;inset:0;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/><circle cx="100" cy="100" r="60" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1"/></svg>') center/400px repeat}
+    #login-box{position:relative;z-index:2;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-radius:16px;padding:32px 28px 36px;width:92%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.4)}
+    .login-brand{font-size:0.65rem;font-weight:800;color:#1a5fa8;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
+    #login-box h2{font-size:1.4rem;font-weight:800;color:#0d2847;margin-bottom:20px;line-height:1.2}
+    #login-error{color:#c0392b;font-size:0.85rem;margin-bottom:10px;text-align:center;display:none}
+    .login-wave{font-size:3rem;text-align:center;margin-bottom:16px}
+
+    /* ── APP SHELL ── */
+    #app{display:none}
+    header{background:linear-gradient(135deg,#0d2847,#1a5fa8);color:white;padding:10px 16px;text-align:center;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:center}
+    header h1{font-size:0.95rem;font-weight:800;letter-spacing:0.5px}
+    header .h-sub{font-size:0.6rem;opacity:0.6;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+    #logout-btn{position:absolute;right:14px;background:rgba(255,255,255,0.15);border:none;color:white;font-size:0.72rem;font-weight:600;padding:6px 10px;border-radius:6px;cursor:pointer}
+
+    nav{display:flex;background:#0d2847;position:sticky;top:52px;z-index:10;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    nav::-webkit-scrollbar{display:none}
+    nav button{flex:0 0 auto;min-width:64px;padding:10px 8px 8px;background:none;border:none;color:rgba(255,255,255,0.45);font-size:0.58rem;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;text-transform:uppercase;letter-spacing:0.4px;line-height:1.3;white-space:nowrap}
+    nav button i{display:block;font-size:1rem;margin-bottom:2px}
+    nav button.active{color:#64b5f6;border-bottom-color:#64b5f6}
+
+    .tab{display:none;padding:16px;max-width:800px;margin:0 auto;padding-bottom:40px}
+    .tab.active{display:block}
+
+    /* Cards */
+    .card{background:white;border-radius:12px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+    .card-title{font-size:1rem;font-weight:700;color:#0d2847;margin-bottom:2px}
+    .card-sub{font-size:0.82rem;color:#666;margin-bottom:8px}
+    .card-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+    /* Buttons */
+    .btn{display:inline-block;padding:9px 16px;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;-webkit-tap-highlight-color:transparent}
+    .btn-primary{background:#1a5fa8;color:white}
+    .btn-danger{background:#c0392b;color:white}
+    .btn-ghost{background:#e8edf3;color:#333}
+    .btn-success{background:#27ae60;color:white}
+    .btn-warning{background:#f39c12;color:white}
+    .btn-sm{padding:6px 12px;font-size:0.78rem}
+    .btn-full{width:100%;padding:13px;font-size:0.95rem;margin-bottom:14px;border-radius:10px}
+
+    /* Badges */
+    .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:0.7rem;font-weight:700;text-transform:capitalize}
+    .badge-scheduled{background:#e3f2fd;color:#1565c0}
+    .badge-in-progress{background:#fff3e0;color:#e65100}
+    .badge-completed{background:#e8f5e9;color:#2e7d32}
+    .badge-cancelled{background:#fce4ec;color:#c62828}
+    .badge-needs-return{background:#f3e5f5;color:#6a1b9a}
+    .badge-draft{background:#f5f5f5;color:#616161}
+    .badge-sent{background:#e3f2fd;color:#1565c0}
+    .badge-paid{background:#e8f5e9;color:#2e7d32}
+    .badge-overdue{background:#fce4ec;color:#c62828}
+    .badge-void{background:#f5f5f5;color:#9e9e9e}
+
+    /* Dashboard */
+    .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+    .dash-tile{background:white;border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+    .dash-tile .dt-val{font-size:1.3rem;font-weight:800;color:#1a5fa8}
+    .dash-tile .dt-val.green{color:#27ae60}
+    .dash-tile .dt-val.red{color:#c0392b}
+    .dash-tile .dt-val.amber{color:#f39c12}
+    .dash-tile .dt-label{font-size:0.7rem;color:#888;margin-top:2px;text-transform:uppercase;letter-spacing:0.4px}
+
+    /* Subview */
+    .subview{display:none}
+    .subview.active{display:block}
+    .main-view{display:block}
+    .main-view.hidden{display:none}
+    .back-btn{background:none;border:none;color:#1a5fa8;font-size:0.9rem;font-weight:700;cursor:pointer;margin-bottom:14px;padding:4px 0;display:inline-flex;align-items:center;gap:4px}
+
+    .section-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .section-row h2{font-size:1rem;font-weight:700;color:#0d2847}
+
+    .item-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0}
+    .item-row:last-child{border-bottom:none}
+
+    /* Modal */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:flex-end;justify-content:center}
+    .overlay.open{display:flex}
+    .modal{background:white;border-radius:18px 18px 0 0;padding:20px 18px 32px;width:100%;max-width:600px;max-height:88vh;overflow-y:auto}
+    .modal h2{font-size:1.05rem;font-weight:700;margin-bottom:16px;color:#0d2847}
+    .modal-drag{width:40px;height:4px;background:#ddd;border-radius:4px;margin:0 auto 16px}
+
+    /* Forms */
+    .fg{margin-bottom:12px}
+    .fg label{display:block;font-size:0.78rem;font-weight:700;color:#555;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px}
+    .fg input,.fg select,.fg textarea{width:100%;padding:11px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:0.95rem;background:white;color:#222;-webkit-appearance:none;appearance:none}
+    .fg textarea{min-height:72px;resize:vertical}
+    .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:#1a5fa8}
+    .fg-row{display:flex;gap:10px}
+    .fg-row .fg{flex:1}
+    .form-btns{display:flex;gap:10px;margin-top:16px}
+    .form-btns .btn{flex:1;padding:13px;font-size:0.95rem}
+
+    /* Photos */
+    .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin:10px 0}
+    .photo-grid img{width:100%;height:100px;object-fit:cover;border-radius:8px;cursor:pointer}
+    .photo-upload-btn{border:2px dashed #bbb;border-radius:8px;padding:12px;text-align:center;cursor:pointer;background:#fafbfc;color:#888;font-size:0.85rem;font-weight:600}
+    .photo-upload-btn:active{background:#e8edf3}
+
+    /* Tables */
+    .data-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+    .data-table th{background:#f5f7fa;color:#555;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.4px;padding:8px 10px;text-align:left}
+    .data-table td{padding:9px 10px;border-bottom:1px solid #f0f0f0}
+    .data-table tr:last-child td{border-bottom:none}
+
+    /* Empty/loading */
+    .empty{text-align:center;padding:48px 16px;color:#aaa;font-size:0.9rem}
+    .empty .empty-icon{font-size:2.5rem;margin-bottom:8px}
+    .loading{text-align:center;padding:32px;color:#aaa}
+
+    /* Toast */
+    #toast{display:none;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#0d2847;color:white;padding:10px 20px;border-radius:20px;font-size:0.85rem;font-weight:600;z-index:999;white-space:nowrap}
+
+    /* Photo lightbox */
+    #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:300;align-items:center;justify-content:center}
+    #lightbox.open{display:flex}
+    #lightbox img{max-width:95%;max-height:90vh;border-radius:8px}
+    #lightbox .lb-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5rem;width:40px;height:40px;border-radius:50%;cursor:pointer}
+
+    /* Spec tag */
+    .spec-tag{display:inline-block;background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:4px;font-size:0.72rem;font-weight:600;margin:2px}
+
+    /* Job card */
+    .job-card{border-left:4px solid #1a5fa8;padding-left:12px}
+    .job-card.maintenance{border-left-color:#27ae60}
+    .job-card.repair{border-left-color:#f39c12}
+    .job-card.open,.job-card.close{border-left-color:#8e44ad}
+    .job-card.install{border-left-color:#1a5fa8}
+    .job-card.cleaning{border-left-color:#00bcd4}
+
+    @media(max-width:400px){.dash-grid{grid-template-columns:1fr 1fr}.fg-row{flex-direction:column;gap:0}}
+  </style>
+</head>
+<body>
+
+<!-- ═══ LANDING ═══ -->
+<div id="landing">
+  <div id="login-box">
+    <div class="login-wave">🏊‍♂️</div>
+    <div class="login-brand">Freedom Pools Tennessee</div>
+    <h2>Welcome back.</h2>
+    <div id="login-error"></div>
+    <div class="fg"><label>Username</label><input id="l-user" type="text" placeholder="username" autocomplete="username"></div>
+    <div class="fg"><label>Password</label><input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:8px;margin-bottom:0" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- ═══ APP SHELL ═══ -->
+<div id="app">
+<header>
+  <div><h1>Freedom Pools TN</h1><div class="h-sub">Pool Service Manager</div></div>
+  <button id="logout-btn" onclick="doLogout()">Sign Out</button>
+</header>
+
+<nav>
+  <button onclick="showTab('dashboard')"><i class="fa-solid fa-house"></i>Home</button>
+  <button onclick="showTab('customers')"><i class="fa-solid fa-users"></i>Customers</button>
+  <button onclick="showTab('jobs')"><i class="fa-solid fa-clipboard-list"></i>Jobs</button>
+  <button onclick="showTab('invoices')"><i class="fa-solid fa-file-invoice-dollar"></i>Invoices</button>
+  <button onclick="showTab('inventory')"><i class="fa-solid fa-boxes-stacked"></i>Inventory</button>
+  <button onclick="showTab('reports')"><i class="fa-solid fa-chart-line"></i>Reports</button>
+  <button onclick="showTab('settings')"><i class="fa-solid fa-gear"></i>Settings</button>
+</nav>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="tab-dashboard" class="tab">
+  <div id="dash-grid"></div>
+  <div class="section-row"><h2>Today's Jobs</h2></div>
+  <div id="dash-today-jobs"><div class="loading">Loading...</div></div>
+  <div class="section-row" style="margin-top:16px"><h2>Recent Payments</h2></div>
+  <div id="dash-recent-payments"></div>
+</div>
+
+<!-- ═══ CUSTOMERS ═══ -->
+<div id="tab-customers" class="tab">
+  <div id="customers-main" class="main-view">
+    <button class="btn btn-primary btn-full" onclick="openModal('customer-modal')">+ Add Customer</button>
+    <div id="customers-list"><div class="loading">Loading...</div></div>
+  </div>
+  <div id="customers-detail" class="subview">
+    <button class="back-btn" onclick="closeCustomerDetail()">← All Customers</button>
+    <div id="customer-detail-content"></div>
+  </div>
+</div>
+
+<!-- ═══ JOBS ═══ -->
+<div id="tab-jobs" class="tab">
+  <div id="jobs-main" class="main-view">
+    <button class="btn btn-primary btn-full" onclick="openJobModal()">+ New Job</button>
+    <div class="fg-row" style="margin-bottom:12px">
+      <div class="fg" style="margin-bottom:0"><label>Date</label><input id="jobs-filter-date" type="date" onchange="loadJobs()"></div>
+      <div class="fg" style="margin-bottom:0"><label>Status</label>
+        <select id="jobs-filter-status" onchange="loadJobs()">
+          <option value="">All</option><option value="scheduled">Scheduled</option><option value="in-progress">In Progress</option><option value="completed">Completed</option><option value="needs-return">Needs Return</option>
+        </select>
+      </div>
+    </div>
+    <div id="jobs-list"><div class="loading">Loading...</div></div>
+  </div>
+  <div id="jobs-detail" class="subview">
+    <button class="back-btn" onclick="closeJobDetail()">← All Jobs</button>
+    <div id="job-detail-content"></div>
+  </div>
+</div>
+
+<!-- ═══ INVOICES ═══ -->
+<div id="tab-invoices" class="tab">
+  <div id="invoices-main" class="main-view">
+    <div class="fg" style="margin-bottom:12px"><label>Filter</label>
+      <select id="inv-filter-status" onchange="loadInvoices()">
+        <option value="">All</option><option value="draft">Draft</option><option value="sent">Sent</option><option value="paid">Paid</option><option value="overdue">Overdue</option>
+      </select>
+    </div>
+    <div id="invoices-list"><div class="loading">Loading...</div></div>
+  </div>
+  <div id="invoices-detail" class="subview">
+    <button class="back-btn" onclick="closeInvoiceDetail()">← All Invoices</button>
+    <div id="invoice-detail-content"></div>
+  </div>
+</div>
+
+<!-- ═══ INVENTORY ═══ -->
+<div id="tab-inventory" class="tab">
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button class="btn btn-ghost btn-sm" onclick="setInvView('parts')" id="iv-parts" style="flex:1">🔧 Truck Parts</button>
+    <button class="btn btn-ghost btn-sm" onclick="setInvView('chemicals')" id="iv-chemicals" style="flex:1">🧪 Chemicals</button>
+  </div>
+  <div id="inv-parts-view">
+    <button class="btn btn-primary btn-full" onclick="openModal('part-modal')">+ Add Part</button>
+    <div id="parts-list"><div class="loading">Loading...</div></div>
+  </div>
+  <div id="inv-chemicals-view" style="display:none">
+    <button class="btn btn-primary btn-full" onclick="openModal('chemical-modal')">+ Add Chemical</button>
+    <div id="chemicals-list"><div class="loading">Loading...</div></div>
+  </div>
+</div>
+
+<!-- ═══ REPORTS ═══ -->
+<div id="tab-reports" class="tab">
+  <div style="display:flex;gap:8px;margin-bottom:12px;overflow-x:auto">
+    <button class="btn btn-ghost btn-sm" onclick="setReportView('revenue')" id="rv-revenue" style="flex:0 0 auto">📊 Revenue</button>
+    <button class="btn btn-ghost btn-sm" onclick="setReportView('aging')" id="rv-aging" style="flex:0 0 auto">⏰ AR Aging</button>
+  </div>
+  <div id="report-revenue-view">
+    <div class="card" style="margin-bottom:12px">
+      <div class="fg" style="margin-bottom:0"><label>Year</label>
+        <select id="report-year" onchange="loadRevenue()"></select>
+      </div>
+    </div>
+    <div id="revenue-content"><div class="loading">Loading...</div></div>
+  </div>
+  <div id="report-aging-view" style="display:none">
+    <div id="aging-content"><div class="loading">Loading...</div></div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div id="tab-settings" class="tab">
+  <div class="card">
+    <h3 style="font-size:0.9rem;font-weight:700;color:#0d2847;margin-bottom:12px">Company Info</h3>
+    <div class="fg"><label>Company Name</label><input id="set-company" type="text" placeholder="Freedom Pools Tennessee"></div>
+    <div class="fg"><label>Phone</label><input id="set-phone" type="text" placeholder="(615) 555-0000"></div>
+    <div class="fg"><label>Email</label><input id="set-email" type="email" placeholder="info@freedompoolstn.com"></div>
+    <div class="fg"><label>Default Tax Rate (%)</label><input id="set-tax" type="number" step="0.01" placeholder="0"></div>
+    <button class="btn btn-primary" onclick="saveCompanySettings()">Save Company Settings</button>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:0.9rem;font-weight:700;color:#0d2847;margin-bottom:12px">AI Equipment Scanning</h3>
+    <p style="font-size:0.82rem;color:#666;margin-bottom:10px">Anthropic API key enables AI-powered equipment tag reading. Photos of nameplates auto-extract manufacturer, model, serial, specs.</p>
+    <div id="ai-key-status" style="font-size:0.82rem;margin-bottom:8px"></div>
+    <div class="fg"><label>Anthropic API Key</label><input id="set-ai-key" type="password" placeholder="sk-ant-..."></div>
+    <button class="btn btn-primary" onclick="saveAiKey()">Save API Key</button>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:0.9rem;font-weight:700;color:#0d2847;margin-bottom:12px">Stripe Payments</h3>
+    <p style="font-size:0.82rem;color:#666;margin-bottom:10px">Connect Stripe to accept online payments. Get keys from dashboard.stripe.com</p>
+    <div id="stripe-key-status" style="font-size:0.82rem;margin-bottom:8px"></div>
+    <div class="fg"><label>Stripe Secret Key</label><input id="set-stripe-key" type="password" placeholder="sk_live_..."></div>
+    <div class="fg"><label>Stripe Webhook Secret</label><input id="set-stripe-wh" type="password" placeholder="whsec_..."></div>
+    <button class="btn btn-primary" onclick="saveStripeKeys()">Save Stripe Keys</button>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:0.9rem;font-weight:700;color:#0d2847;margin-bottom:12px">Change Password</h3>
+    <div class="fg"><label>Current Password</label><input id="set-cur-pass" type="password"></div>
+    <div class="fg"><label>New Password</label><input id="set-new-pass" type="password" placeholder="At least 6 characters"></div>
+    <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font-size:0.9rem;font-weight:700;color:#0d2847;margin:0">User Management</h3>
+      <button class="btn btn-primary btn-sm" onclick="openModal('user-modal')">+ Add User</button>
+    </div>
+    <div id="users-list"><div class="loading">Loading...</div></div>
+  </div>
+</div>
+
+</div><!-- /#app -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Customer modal -->
+<div id="customer-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h2 id="customer-modal-title">Add Customer</h2>
+    <input type="hidden" id="cust-id">
+    <div class="fg"><label>Name *</label><input id="c-name" type="text" placeholder="John Smith"></div>
+    <div class="fg"><label>Address</label><input id="c-address" type="text" placeholder="123 Pool Lane"></div>
+    <div class="fg-row">
+      <div class="fg"><label>City</label><input id="c-city" type="text" placeholder="Nashville"></div>
+      <div class="fg"><label>State</label><input id="c-state" type="text" value="TN"></div>
+      <div class="fg"><label>ZIP</label><input id="c-zip" type="text" placeholder="37000"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Phone</label><input id="c-phone" type="tel" placeholder="(615) 555-0000"></div>
+      <div class="fg"><label>Email</label><input id="c-email" type="email" placeholder="john@email.com"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Monthly Rate ($)</label><input id="c-rate" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="fg"><label>Billing</label>
+        <select id="c-billing"><option value="monthly">Monthly</option><option value="per-visit">Per Visit</option><option value="quarterly">Quarterly</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Notes</label><textarea id="c-notes" placeholder="Gate code, dog, special instructions..."></textarea></div>
+    <div class="form-btns">
+      <button class="btn btn-ghost" onclick="closeModal('customer-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pool modal -->
+<div id="pool-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h2>Add Pool</h2>
+    <input type="hidden" id="pool-id">
+    <input type="hidden" id="pool-cust-id">
+    <div class="fg-row">
+      <div class="fg"><label>Name</label><input id="p-name" type="text" value="Main Pool"></div>
+      <div class="fg"><label>Type</label>
+        <select id="p-type"><option value="">-</option><option>Inground</option><option>Above-ground</option><option>Spa/Hot Tub</option><option>Swim Spa</option></select>
+      </div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Size (gal)</label><input id="p-gallons" type="number" placeholder="15000"></div>
+      <div class="fg"><label>Surface</label>
+        <select id="p-surface"><option value="">-</option><option>Plaster</option><option>Vinyl</option><option>Fiberglass</option><option>Pebble</option><option>Tile</option></select>
+      </div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Filter Type</label>
+        <select id="p-filter"><option value="">-</option><option>Sand</option><option>Cartridge</option><option>DE</option></select>
+      </div>
+      <div class="fg"><label>Chlorine</label>
+        <select id="p-chlorine"><option value="">-</option><option>Salt</option><option>Tablet</option><option>Liquid</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Heater</label><input id="p-heater" type="text" placeholder="Gas, Heat pump, Electric, None"></div>
+    <div class="fg"><label>Notes</label><textarea id="p-notes"></textarea></div>
+    <div class="form-btns">
+      <button class="btn btn-ghost" onclick="closeModal('pool-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePool()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Equipment modal -->
+<div id="equip-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h2 id="equip-modal-title">Add Equipment</h2>
+    <input type="hidden" id="eq-id">
+    <input type="hidden" id="eq-cust-id">
+    <div class="fg-row">
+      <div class="fg"><label>Type *</label>
+        <select id="eq-type"><option value="pump">Pump</option><option value="filter">Filter</option><option value="heater">Heater</option><option value="chlorinator">Chlorinator</option><option value="automation">Automation</option><option value="cleaner">Cleaner</option><option value="light">Light</option><option value="other">Other</option></select>
+      </div>
+      <div class="fg"><label>Condition</label>
+        <select id="eq-condition"><option value="good">Good</option><option value="fair">Fair</option><option value="needs-repair">Needs Repair</option><option value="replaced">Replaced</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Manufacturer</label><input id="eq-manufacturer" type="text" placeholder="Pentair, Hayward, Jandy..."></div>
+    <div class="fg-row">
+      <div class="fg"><label>Model #</label><input id="eq-model" type="text"></div>
+      <div class="fg"><label>Serial #</label><input id="eq-serial" type="text"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Install Date</label><input id="eq-install" type="date"></div>
+      <div class="fg"><label>Warranty Exp</label><input id="eq-warranty" type="date"></div>
+    </div>
+    <div class="fg"><label>Notes</label><textarea id="eq-notes"></textarea></div>
+    <div class="form-btns">
+      <button class="btn btn-ghost" onclick="closeModal('equip-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEquipment()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Job modal -->
+<div id="job-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h2 id="job-modal-title">New Job</h2>
+    <input type="hidden" id="job-id">
+    <div class="fg"><label>Customer *</label><select id="j-customer"><option value="">Select customer...</option></select></div>
+    <div class="fg-row">
+      <div class="fg"><label>Job Type *</label>
+        <select id="j-type"><option value="maintenance">Maintenance</option><option value="repair">Repair</option><option value="open">Pool Open</option><option value="close">Pool Close</option><option value="install">Install</option><option value="cleaning">Cleaning</option></select>
+      </div>
+      <div class="fg"><label>Status</label>
+        <select id="j-status"><option value="scheduled">Scheduled</option><option value="in-progress">In Progress</option></select>
+      </div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Date *</label><input id="j-date" type="date"></div>
+      <div class="fg"><label>Time</label><input id="j-time" type="time"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Flat Rate ($)</label><input id="j-flat" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="fg"><label>Labor Rate ($/hr)</label><input id="j-labor-rate" type="number" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="fg"><label>Description</label><textarea id="j-desc" placeholder="What needs to be done..."></textarea></div>
+    <div class="fg"><label>Internal Notes</label><textarea id="j-notes" placeholder="Notes for techs..."></textarea></div>
+    <div class="form-btns">
+      <button class="btn btn-ghost" onclick="closeModal('job-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveJob()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Part modal -->
+<div id="part-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h2 id="part-modal-title">Add Truck Part</h2>
+    <input type="hidden" id="part-id">
+    <div class="fg"><label>Part Name *</label><input id="pt-name" type="text" placeholder='1.5" Union, O-Ring...'></div>
+    <div class="fg-row">
+      <div class="fg"><label>Category</label>
+        <select id="pt-category"><option value="">-</option><option>Plumbing</option><option>Seals</option><option>Electrical</option><option>Filters</option><option>Misc</option></select>
+      </div>
+      <div class="fg"><label>Unit</label><input id="pt-unit" type="text" value="each"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Qty On Hand</label><input id="pt-qty" type="number" value="0"></div>
+      <div class="fg"><label>Reorder Level</label><input id="pt-reorder" type="number" value="2"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Cost ($)</label><input id="pt-cost" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="fg"><label>Sell ($)</label><input id="pt-sell" type="number" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="fg"><label>Notes</label><textarea id="pt-notes"></textarea></div>
+    <div class="form-btns">
+      <button class="btn btn-ghost" onclick="closeModal('part-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePart()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chemical modal -->
+<div id="chemical-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h2>Add Chemical</h2>
+    <input type="hidden" id="chem-id">
+    <div class="fg"><label>Chemical Name *</label><input id="ch-name" type="text" placeholder="Liquid Chlorine, Muriatic Acid..."></div>
+    <div class="fg-row">
+      <div class="fg"><label>Category</label>
+        <select id="ch-category"><option value="">-</option><option>Sanitizer</option><option>Shock</option><option>Algaecide</option><option>pH</option><option>Alkalinity</option><option>Calcium</option><option>Stabilizer</option><option>Other</option></select>
+      </div>
+      <div class="fg"><label>Unit</label><input id="ch-unit" type="text" value="oz"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Cost / Unit ($)</label><input id="ch-cost" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="fg"><label>Sell / Unit ($)</label><input id="ch-sell" type="number" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="form-btns">
+      <button class="btn btn-ghost" onclick="closeModal('chemical-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveChemical()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invoice line item modal -->
+<div id="lineitem-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h2>Add Line Item</h2>
+    <input type="hidden" id="li-inv-id">
+    <div class="fg"><label>Description *</label><input id="li-desc" type="text" placeholder="Service, part, chemical..."></div>
+    <div class="fg-row">
+      <div class="fg"><label>Qty</label><input id="li-qty" type="number" step="0.1" value="1"></div>
+      <div class="fg"><label>Unit Price ($)</label><input id="li-price" type="number" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="fg"><label>Type</label>
+      <select id="li-type"><option value="service">Service</option><option value="labor">Labor</option><option value="chemical">Chemical</option><option value="part">Part</option><option value="other">Other</option></select>
+    </div>
+    <div class="form-btns">
+      <button class="btn btn-ghost" onclick="closeModal('lineitem-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLineItem()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment modal -->
+<div id="payment-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h2>Record Payment</h2>
+    <input type="hidden" id="pay-inv-id">
+    <div class="fg"><label>Amount ($) *</label><input id="pay-amount" type="number" step="0.01" placeholder="0.00"></div>
+    <div class="fg"><label>Method *</label>
+      <select id="pay-method"><option value="card">Card</option><option value="cash">Cash</option><option value="check">Check</option><option value="ach">ACH</option><option value="auto-pay">Auto-Pay</option></select>
+    </div>
+    <div class="fg"><label>Reference / Note</label><input id="pay-note" type="text" placeholder="Check #, notes..."></div>
+    <div class="form-btns">
+      <button class="btn btn-ghost" onclick="closeModal('payment-modal')">Cancel</button>
+      <button class="btn btn-success" onclick="savePayment()">Record Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- User modal -->
+<div id="user-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h2>Add User</h2>
+    <div class="fg"><label>Username *</label><input id="u-username" type="text"></div>
+    <div class="fg"><label>Password *</label><input id="u-password" type="password" placeholder="At least 6 characters"></div>
+    <div class="fg"><label>Full Name</label><input id="u-fullname" type="text"></div>
+    <div class="fg"><label>Role</label>
+      <select id="u-role"><option value="tech">Tech</option><option value="office">Office</option><option value="owner">Owner</option></select>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Phone</label><input id="u-phone" type="tel"></div>
+      <div class="fg"><label>Email</label><input id="u-email" type="email"></div>
+    </div>
+    <div class="form-btns">
+      <button class="btn btn-ghost" onclick="closeModal('user-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveUser()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Photo lightbox -->
+<div id="lightbox"><button class="lb-close" onclick="closeLightbox()">✕</button><img id="lb-img" src=""></div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════ CORE ═══════════════
+const API = '/api';
+let TOKEN = localStorage.getItem('fp_token');
+let USER = JSON.parse(localStorage.getItem('fp_user') || 'null');
+
+function headers() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN }; }
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, { headers: headers(), ...opts });
+  if (res.status === 401) { doLogout(); throw new Error('Session expired'); }
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Request failed'); }
+  const ct = res.headers.get('content-type');
+  if (ct && ct.includes('json')) return res.json();
+  return res.text();
+}
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
+function $(id) { return document.getElementById(id); }
+function fmt$(n) { return '$' + (parseFloat(n) || 0).toFixed(2); }
+function fmtDate(d) { if (!d) return '-'; return new Date(d).toLocaleDateString(); }
+
+// ═══ AUTH ═══
+async function doLogin() {
+  const username = $('l-user').value, password = $('l-pass').value;
+  try {
+    const data = await fetch(API + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) }).then(r => r.json());
+    if (data.error) { $('login-error').textContent = data.error; $('login-error').style.display = 'block'; return; }
+    TOKEN = data.token; USER = data;
+    localStorage.setItem('fp_token', TOKEN); localStorage.setItem('fp_user', JSON.stringify(USER));
+    enterApp();
+  } catch (e) { $('login-error').textContent = 'Connection error'; $('login-error').style.display = 'block'; }
+}
+function doLogout() { TOKEN = null; USER = null; localStorage.removeItem('fp_token'); localStorage.removeItem('fp_user'); location.reload(); }
+function enterApp() { $('landing').style.display = 'none'; $('app').style.display = 'block'; showTab('dashboard'); }
+$('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+if (TOKEN) enterApp();
+
+// ═══ TABS ═══
+let currentTab = '';
+function showTab(name) {
+  currentTab = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const tab = $('tab-' + name);
+  if (tab) tab.classList.add('active');
+  document.querySelectorAll('nav button').forEach((b, i) => {
+    b.classList.toggle('active', ['dashboard','customers','jobs','invoices','inventory','reports','settings'][i] === name);
+  });
+  // Load data
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'customers') loadCustomers();
+  if (name === 'jobs') loadJobs();
+  if (name === 'invoices') loadInvoices();
+  if (name === 'inventory') { loadParts(); loadChemicals(); }
+  if (name === 'reports') { initReportYears(); loadRevenue(); }
+  if (name === 'settings') { loadSettings(); loadUsers(); }
+}
+
+function openModal(id) { $(id).classList.add('open'); }
+function closeModal(id) { $(id).classList.remove('open'); }
+
+// ═══ DASHBOARD ═══
+async function loadDashboard() {
+  try {
+    const d = await api('/reports/dashboard');
+    $('dash-grid').innerHTML = `
+      <div class="dash-tile"><div class="dt-val">${d.today_jobs}</div><div class="dt-label">Today's Jobs</div></div>
+      <div class="dash-tile"><div class="dt-val">${d.open_jobs}</div><div class="dt-label">Open Jobs</div></div>
+      <div class="dash-tile"><div class="dt-val green">${fmt$(d.month_revenue)}</div><div class="dt-label">This Month</div></div>
+      <div class="dash-tile"><div class="dt-val ${d.unpaid_total > 0 ? 'red' : ''}">${fmt$(d.unpaid_total)}</div><div class="dt-label">${d.unpaid_invoices} Unpaid</div></div>
+      <div class="dash-tile"><div class="dt-val">${d.active_customers}</div><div class="dt-label">Customers</div></div>
+      <div class="dash-tile"><div class="dt-val ${d.low_stock_count > 0 ? 'amber' : ''}">${d.low_stock_count}</div><div class="dt-label">Low Stock</div></div>`;
+
+    if (d.today_job_list.length === 0) {
+      $('dash-today-jobs').innerHTML = '<div class="empty"><div class="empty-icon">📋</div>No jobs scheduled today</div>';
+    } else {
+      $('dash-today-jobs').innerHTML = d.today_job_list.map(j => `
+        <div class="card job-card ${j.job_type}" onclick="openJobDetail(${j.id})">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="card-title">${esc(j.customer_name)}</div>
+            <span class="badge badge-${j.status}">${j.status}</span>
+          </div>
+          <div class="card-sub">${j.scheduled_time || ''} · ${j.job_type} ${j.customer_address ? '· ' + esc(j.customer_address) : ''}</div>
+        </div>`).join('');
+    }
+
+    if (d.recent_payments.length === 0) {
+      $('dash-recent-payments').innerHTML = '<div class="card" style="color:#999;font-size:0.85rem">No recent payments</div>';
+    } else {
+      $('dash-recent-payments').innerHTML = d.recent_payments.map(p => `
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-weight:600;font-size:0.9rem">${esc(p.customer_name || 'Unknown')}</div><div style="font-size:0.78rem;color:#888">${p.invoice_number || ''} · ${p.method}</div></div>
+          <div style="font-weight:700;color:#27ae60">${fmt$(p.amount)}</div>
+        </div>`).join('');
+    }
+  } catch (e) { $('dash-grid').innerHTML = '<div class="empty">Error loading dashboard</div>'; }
+}
+
+// ═══ CUSTOMERS ═══
+let customersCache = [];
+async function loadCustomers() {
+  try {
+    customersCache = await api('/customers');
+    if (customersCache.length === 0) {
+      $('customers-list').innerHTML = '<div class="empty"><div class="empty-icon">👤</div>No customers yet</div>';
+      return;
+    }
+    $('customers-list').innerHTML = customersCache.map(c => `
+      <div class="card" onclick="openCustomerDetail(${c.id})" style="cursor:pointer">
+        <div class="card-title">${esc(c.name)}</div>
+        <div class="card-sub">${esc(c.address || '')} ${c.city ? ', ' + esc(c.city) : ''} · ${esc(c.phone || '')}</div>
+        ${c.billing_rate ? '<div style="font-size:0.82rem;color:#1a5fa8;font-weight:600">' + fmt$(c.billing_rate) + '/mo</div>' : ''}
+      </div>`).join('');
+  } catch (e) { $('customers-list').innerHTML = '<div class="empty">Error loading customers</div>'; }
+}
+
+async function openCustomerDetail(id) {
+  $('customers-main').classList.add('hidden');
+  $('customers-detail').classList.add('active');
+  $('customer-detail-content').innerHTML = '<div class="loading">Loading...</div>';
+  try {
+    const c = await api('/customers/' + id);
+    let html = `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div><div class="card-title" style="font-size:1.15rem">${esc(c.name)}</div>
+          <div class="card-sub">${esc(c.address || '')} ${c.city ? ', ' + esc(c.city) : ''} ${c.state || ''} ${c.zip || ''}</div></div>
+          <button class="btn btn-sm btn-ghost" onclick="editCustomer(${c.id})"><i class="fa-solid fa-pen"></i></button>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:8px;font-size:0.85rem">
+          ${c.phone ? '<div>📞 ' + esc(c.phone) + '</div>' : ''}
+          ${c.email ? '<div>📧 ' + esc(c.email) + '</div>' : ''}
+        </div>
+        ${c.billing_rate ? '<div style="margin-top:6px;font-size:0.9rem;color:#1a5fa8;font-weight:700">' + fmt$(c.billing_rate) + ' / ' + (c.billing_frequency || 'month') + '</div>' : ''}
+        ${c.notes ? '<div style="margin-top:6px;font-size:0.82rem;color:#666;background:#f5f7fa;padding:8px;border-radius:6px">' + esc(c.notes) + '</div>' : ''}
+      </div>`;
+
+    // Pools
+    html += `<div class="section-row"><h2>Pools</h2><button class="btn btn-primary btn-sm" onclick="openPoolModal(${c.id})">+ Add Pool</button></div>`;
+    if (c.pools.length === 0) html += '<div class="card" style="color:#999;font-size:0.85rem">No pools added yet</div>';
+    c.pools.forEach(p => {
+      html += `<div class="card"><div class="card-title">${esc(p.name)}</div>
+        <div class="card-sub">${[p.pool_type, p.size_gallons ? p.size_gallons + ' gal' : '', p.surface_type, p.filter_type + ' filter', p.chlorine_type].filter(Boolean).join(' · ')}</div></div>`;
+    });
+
+    // Equipment
+    html += `<div class="section-row" style="margin-top:12px"><h2>Equipment</h2><button class="btn btn-primary btn-sm" onclick="openEquipModal(${c.id})">+ Add Equipment</button></div>`;
+    if (c.equipment.length === 0) html += '<div class="card" style="color:#999;font-size:0.85rem">No equipment yet — add equipment and scan tags!</div>';
+    c.equipment.forEach(e => {
+      const specs = e.specs || {};
+      html += `<div class="card" onclick="openEquipDetail(${e.id})" style="cursor:pointer">
+        <div style="display:flex;justify-content:space-between"><div class="card-title">${esc(e.equipment_type)}</div><span class="badge badge-${e.condition === 'good' ? 'completed' : e.condition === 'needs-repair' ? 'overdue' : 'draft'}">${e.condition || '-'}</span></div>
+        <div class="card-sub">${[e.manufacturer, e.model_number].filter(Boolean).join(' · ')}</div>
+        ${e.serial_number ? '<div style="font-size:0.78rem;color:#888">S/N: ' + esc(e.serial_number) + '</div>' : ''}
+        <div style="margin-top:4px">${Object.entries(specs).filter(([k,v]) => v).map(([k,v]) => '<span class="spec-tag">' + k + ': ' + v + '</span>').join('')}</div>
+      </div>`;
+    });
+
+    // Photos
+    html += `<div class="section-row" style="margin-top:12px"><h2>Site Photos</h2></div>
+      <div class="photo-upload-btn" onclick="uploadCustomerPhoto(${c.id})">📷 Upload Site Photo</div>
+      <input type="file" id="cust-photo-input-${c.id}" accept="image/*" capture="environment" style="display:none" onchange="doUploadCustomerPhoto(${c.id}, this)">`;
+    if (c.photos.length > 0) {
+      html += '<div class="photo-grid">' + c.photos.map(p => `<img src="${p.file_path}" onclick="openLightbox('${p.file_path}')">`).join('') + '</div>';
+    }
+
+    // Jobs
+    html += `<div class="section-row" style="margin-top:12px"><h2>Job History</h2></div>`;
+    if (c.jobs.length === 0) html += '<div class="card" style="color:#999;font-size:0.85rem">No jobs yet</div>';
+    c.jobs.forEach(j => {
+      html += `<div class="card job-card ${j.job_type}" onclick="openJobDetail(${j.id})" style="cursor:pointer">
+        <div style="display:flex;justify-content:space-between"><div class="card-title">${j.job_type}</div><span class="badge badge-${j.status}">${j.status}</span></div>
+        <div class="card-sub">${fmtDate(j.scheduled_date)} ${j.tech_name ? '· ' + esc(j.tech_name) : ''}</div></div>`;
+    });
+
+    // Invoices
+    html += `<div class="section-row" style="margin-top:12px"><h2>Invoices</h2></div>`;
+    c.invoices.forEach(i => {
+      html += `<div class="card" onclick="openInvoiceDetail(${i.id})" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:600">${i.invoice_number}</div><div class="card-sub">${fmtDate(i.created_at)}</div></div>
+        <div style="text-align:right"><div style="font-weight:700">${fmt$(i.total)}</div><span class="badge badge-${i.status}">${i.status}</span></div></div>`;
+    });
+
+    $('customer-detail-content').innerHTML = html;
+  } catch (e) { $('customer-detail-content').innerHTML = '<div class="empty">Error loading customer</div>'; }
+}
+
+function closeCustomerDetail() { $('customers-main').classList.remove('hidden'); $('customers-detail').classList.remove('active'); }
+
+async function saveCustomer() {
+  const id = $('cust-id').value;
+  const body = { name: $('c-name').value, address: $('c-address').value, city: $('c-city').value, state: $('c-state').value, zip: $('c-zip').value, phone: $('c-phone').value, email: $('c-email').value, billing_rate: $('c-rate').value || null, billing_frequency: $('c-billing').value, notes: $('c-notes').value };
+  if (!body.name) return toast('Name is required');
+  try {
+    if (id) await api('/customers/' + id, { method: 'PUT', body: JSON.stringify({ ...body, is_active: true }) });
+    else await api('/customers', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('customer-modal'); toast('Customer saved!'); loadCustomers();
+    ['cust-id','c-name','c-address','c-city','c-zip','c-phone','c-email','c-rate','c-notes'].forEach(f => $(f).value = '');
+    $('c-state').value = 'TN';
+  } catch (e) { toast('Error: ' + e.message); }
+}
+
+async function editCustomer(id) {
+  const c = await api('/customers/' + id);
+  $('cust-id').value = c.id; $('c-name').value = c.name || ''; $('c-address').value = c.address || ''; $('c-city').value = c.city || ''; $('c-state').value = c.state || 'TN'; $('c-zip').value = c.zip || ''; $('c-phone').value = c.phone || ''; $('c-email').value = c.email || ''; $('c-rate').value = c.billing_rate || ''; $('c-billing').value = c.billing_frequency || 'monthly'; $('c-notes').value = c.notes || '';
+  $('customer-modal-title').textContent = 'Edit Customer';
+  openModal('customer-modal');
+}
+
+// ═══ POOLS ═══
+function openPoolModal(custId) { $('pool-cust-id').value = custId; openModal('pool-modal'); }
+async function savePool() {
+  const body = { name: $('p-name').value, pool_type: $('p-type').value, size_gallons: $('p-gallons').value || null, surface_type: $('p-surface').value, filter_type: $('p-filter').value, chlorine_type: $('p-chlorine').value, heater_type: $('p-heater').value, notes: $('p-notes').value };
+  try {
+    await api('/customers/' + $('pool-cust-id').value + '/pools', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('pool-modal'); toast('Pool added!'); openCustomerDetail(parseInt($('pool-cust-id').value));
+  } catch (e) { toast('Error: ' + e.message); }
+}
+
+// ═══ EQUIPMENT ═══
+function openEquipModal(custId) { $('eq-cust-id').value = custId; $('eq-id').value = ''; openModal('equip-modal'); }
+async function saveEquipment() {
+  const id = $('eq-id').value;
+  const body = { customer_id: $('eq-cust-id').value, equipment_type: $('eq-type').value, manufacturer: $('eq-manufacturer').value, model_number: $('eq-model').value, serial_number: $('eq-serial').value, install_date: $('eq-install').value || null, warranty_expiry: $('eq-warranty').value || null, condition: $('eq-condition').value, notes: $('eq-notes').value };
+  try {
+    if (id) await api('/equipment/' + id, { method: 'PUT', body: JSON.stringify(body) });
+    else await api('/equipment', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('equip-modal'); toast('Equipment saved!'); openCustomerDetail(parseInt($('eq-cust-id').value));
+  } catch (e) { toast('Error: ' + e.message); }
+}
+
+async function openEquipDetail(id) {
+  try {
+    const e = await api('/equipment/' + id);
+    const specs = e.specs || {};
+    let html = `<div class="card">
+      <div style="display:flex;justify-content:space-between"><div class="card-title" style="font-size:1.1rem">${esc(e.equipment_type)}</div>
+      <button class="btn btn-sm btn-ghost" onclick="$('eq-id').value=${e.id};$('eq-cust-id').value=${e.customer_id};$('eq-type').value='${e.equipment_type}';$('eq-condition').value='${e.condition||'good'}';$('eq-manufacturer').value='${esc(e.manufacturer||'')}';$('eq-model').value='${esc(e.model_number||'')}';$('eq-serial').value='${esc(e.serial_number||'')}';openModal('equip-modal')"><i class="fa-solid fa-pen"></i></button></div>
+      <div class="card-sub">${[e.manufacturer, e.model_number].filter(Boolean).join(' · ')}</div>
+      ${e.serial_number ? '<div style="font-size:0.85rem;margin-top:4px">Serial: <strong>' + esc(e.serial_number) + '</strong></div>' : ''}
+      <div style="margin-top:8px">${Object.entries(specs).filter(([k,v])=>v).map(([k,v])=>'<span class="spec-tag">'+k+': '+v+'</span>').join('')}</div>
+    </div>`;
+
+    // Photo upload for equipment tag scanning
+    html += `<div class="section-row"><h2>Equipment Photos</h2></div>
+      <div class="photo-upload-btn" onclick="$('equip-photo-input').dataset.eid=${e.id};$('equip-photo-input').click()">📷 Scan Equipment Tag / Add Photo</div>
+      <input type="file" id="equip-photo-input" accept="image/*" capture="environment" style="display:none" onchange="doUploadEquipPhoto(this)">
+      <div style="font-size:0.78rem;color:#888;margin-top:4px">Take a photo of the equipment nameplate — AI will extract manufacturer, model, serial, and specs automatically.</div>`;
+
+    if (e.photos && e.photos.length > 0) {
+      html += '<div class="photo-grid" style="margin-top:8px">' + e.photos.map(p => {
+        let caption = '';
+        if (p.ai_extracted_data && Object.keys(p.ai_extracted_data).length > 0) caption = '<div style="font-size:0.7rem;color:#27ae60;margin-top:2px">✓ AI scanned</div>';
+        return `<div><img src="${p.file_path}" onclick="openLightbox('${p.file_path}')" style="width:100%;height:100px;object-fit:cover;border-radius:8px;cursor:pointer">${caption}</div>`;
+      }).join('') + '</div>';
+    }
+
+    $('customer-detail-content').innerHTML = html + '<button class="btn btn-ghost btn-full" style="margin-top:16px" onclick="openCustomerDetail(' + e.customer_id + ')">← Back to Customer</button>';
+  } catch (e) { toast('Error loading equipment'); }
+}
+
+async function doUploadEquipPhoto(input) {
+  if (!input.files[0]) return;
+  const eid = input.dataset.eid;
+  const fd = new FormData();
+  fd.append('photo', input.files[0]);
+  toast('Uploading & scanning...');
+  try {
+    const res = await fetch(API + '/equipment/' + eid + '/photos', { method: 'POST', headers: { 'Authorization': 'Bearer ' + TOKEN }, body: fd });
+    const data = await res.json();
+    if (data.ai_data && Object.keys(data.ai_data).length > 0) {
+      toast('✓ AI extracted equipment data!');
+    } else {
+      toast('Photo uploaded!');
+    }
+    openEquipDetail(parseInt(eid));
+  } catch (e) { toast('Upload failed'); }
+  input.value = '';
+}
+
+// ═══ CUSTOMER PHOTOS ═══
+function uploadCustomerPhoto(cid) { $('cust-photo-input-' + cid).click(); }
+async function doUploadCustomerPhoto(cid, input) {
+  if (!input.files[0]) return;
+  const fd = new FormData();
+  fd.append('photo', input.files[0]);
+  try {
+    await fetch(API + '/photos/customers/' + cid, { method: 'POST', headers: { 'Authorization': 'Bearer ' + TOKEN }, body: fd });
+    toast('Photo uploaded!'); openCustomerDetail(cid);
+  } catch (e) { toast('Upload failed'); }
+  input.value = '';
+}
+
+// ═══ JOBS ═══
+async function loadJobs() {
+  try {
+    const params = new URLSearchParams();
+    const date = $('jobs-filter-date').value;
+    const status = $('jobs-filter-status').value;
+    if (date) params.set('date', date);
+    if (status) params.set('status', status);
+    const jobs = await api('/jobs?' + params.toString());
+    if (jobs.length === 0) { $('jobs-list').innerHTML = '<div class="empty"><div class="empty-icon">📋</div>No jobs found</div>'; return; }
+    $('jobs-list').innerHTML = jobs.map(j => `
+      <div class="card job-card ${j.job_type}" onclick="openJobDetail(${j.id})" style="cursor:pointer">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="card-title">${esc(j.customer_name || 'Unknown')}</div>
+          <span class="badge badge-${j.status}">${j.status}</span>
+        </div>
+        <div class="card-sub">${fmtDate(j.scheduled_date)} ${j.scheduled_time || ''} · ${j.job_type} ${j.tech_name ? '· ' + esc(j.tech_name) : ''}</div>
+        ${j.customer_address ? '<div style="font-size:0.78rem;color:#888">' + esc(j.customer_address) + '</div>' : ''}
+      </div>`).join('');
+  } catch (e) { $('jobs-list').innerHTML = '<div class="empty">Error loading jobs</div>'; }
+}
+
+async function openJobModal() {
+  $('job-id').value = ''; $('j-desc').value = ''; $('j-notes').value = ''; $('j-flat').value = ''; $('j-labor-rate').value = '';
+  $('j-date').value = new Date().toISOString().split('T')[0];
+  $('j-status').value = 'scheduled';
+  // Load customers for dropdown
+  if (customersCache.length === 0) customersCache = await api('/customers');
+  $('j-customer').innerHTML = '<option value="">Select customer...</option>' + customersCache.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  $('job-modal-title').textContent = 'New Job';
+  openModal('job-modal');
+}
+
+async function saveJob() {
+  const body = {
+    customer_id: $('j-customer').value, job_type: $('j-type').value, status: $('j-status').value,
+    scheduled_date: $('j-date').value, scheduled_time: $('j-time').value,
+    flat_rate: $('j-flat').value || null, labor_rate: $('j-labor-rate').value || null,
+    description: $('j-desc').value, internal_notes: $('j-notes').value
+  };
+  if (!body.customer_id || !body.scheduled_date) return toast('Customer and date are required');
+  try {
+    const id = $('job-id').value;
+    if (id) await api('/jobs/' + id, { method: 'PUT', body: JSON.stringify(body) });
+    else await api('/jobs', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('job-modal'); toast('Job saved!'); loadJobs();
+  } catch (e) { toast('Error: ' + e.message); }
+}
+
+async function openJobDetail(id) {
+  if (currentTab === 'dashboard') showTab('jobs');
+  $('jobs-main').classList.add('hidden'); $('jobs-detail').classList.add('active');
+  $('job-detail-content').innerHTML = '<div class="loading">Loading...</div>';
+  try {
+    const j = await api('/jobs/' + id);
+    let html = `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div><div class="card-title" style="font-size:1.15rem">${esc(j.customer_name)}</div>
+          <div class="card-sub">${j.job_type} · ${fmtDate(j.scheduled_date)} ${j.scheduled_time || ''}</div></div>
+          <span class="badge badge-${j.status}" style="font-size:0.8rem">${j.status}</span>
+        </div>
+        ${j.customer_address ? '<div style="font-size:0.85rem;color:#666;margin-top:4px">📍 ' + esc(j.customer_address) + '</div>' : ''}
+        ${j.tech_name ? '<div style="font-size:0.85rem;color:#666;margin-top:2px">👤 ' + esc(j.tech_name) + '</div>' : ''}
+        ${j.description ? '<div style="margin-top:8px;font-size:0.85rem;background:#f5f7fa;padding:8px;border-radius:6px">' + esc(j.description) + '</div>' : ''}
+        ${j.flat_rate ? '<div style="margin-top:6px;font-size:0.9rem;font-weight:700;color:#1a5fa8">Flat Rate: ' + fmt$(j.flat_rate) + '</div>' : ''}
+        ${j.labor_hours ? '<div style="font-size:0.85rem;color:#666">Labor: ' + j.labor_hours + 'h × ' + fmt$(j.labor_rate) + '</div>' : ''}
+      </div>`;
+
+    // Action buttons
+    if (j.status === 'scheduled') {
+      html += `<button class="btn btn-warning btn-full" onclick="startJob(${j.id})">▶ Start Job</button>`;
+    }
+    if (j.status === 'in-progress') {
+      html += `<div class="fg" style="margin-bottom:8px"><label>Labor Hours</label><input id="complete-hours" type="number" step="0.25" placeholder="Hours worked"></div>
+        <button class="btn btn-success btn-full" onclick="completeJob(${j.id})">✓ Complete Job & Generate Invoice</button>`;
+    }
+
+    // Photos
+    html += `<div class="section-row" style="margin-top:12px"><h2>Job Photos</h2></div>`;
+    ['before', 'after', 'other'].forEach(phase => {
+      html += `<div style="margin-bottom:8px">
+        <div style="font-size:0.78rem;font-weight:700;color:#555;text-transform:uppercase;margin-bottom:4px">${phase} Photos</div>
+        <div class="photo-upload-btn" onclick="$('job-photo-input-${j.id}').dataset.phase='${phase}';$('job-photo-input-${j.id}').click()">📷 Add ${phase} photo</div>`;
+      const phasePhotos = (j.photos || []).filter(p => p.phase === phase);
+      if (phasePhotos.length > 0) {
+        html += '<div class="photo-grid">' + phasePhotos.map(p => `<img src="${p.file_path}" onclick="openLightbox('${p.file_path}')">`).join('') + '</div>';
+      }
+      html += '</div>';
+    });
+    html += `<input type="file" id="job-photo-input-${j.id}" accept="image/*" capture="environment" style="display:none" onchange="doUploadJobPhoto(${j.id}, this)">`;
+
+    // Chemicals
+    html += `<div class="section-row" style="margin-top:12px"><h2>Chemicals Used</h2><button class="btn btn-sm btn-primary" onclick="addJobChemical(${j.id})">+ Add</button></div>`;
+    if (j.chemicals.length > 0) {
+      html += '<div class="card"><table class="data-table"><thead><tr><th>Chemical</th><th>Qty</th><th>Sell</th></tr></thead><tbody>';
+      j.chemicals.forEach(c => { html += `<tr><td>${esc(c.chemical_name)}</td><td>${c.quantity} ${c.unit}</td><td>${fmt$(c.sell_price * c.quantity)}</td></tr>`; });
+      html += '</tbody></table></div>';
+    }
+
+    // Parts
+    html += `<div class="section-row" style="margin-top:12px"><h2>Parts Used</h2><button class="btn btn-sm btn-primary" onclick="addJobPart(${j.id})">+ Add</button></div>`;
+    if (j.parts.length > 0) {
+      html += '<div class="card"><table class="data-table"><thead><tr><th>Part</th><th>Qty</th><th>Source</th><th>Sell</th></tr></thead><tbody>';
+      j.parts.forEach(p => { html += `<tr><td>${esc(p.part_name)}</td><td>${p.quantity}</td><td>${p.source}</td><td>${fmt$(p.sell_each * p.quantity)}</td></tr>`; });
+      html += '</tbody></table></div>';
+    }
+
+    // Invoice link
+    if (j.invoice_id) {
+      html += `<button class="btn btn-ghost btn-full" style="margin-top:12px" onclick="openInvoiceDetail(${j.invoice_id})">📄 View Invoice</button>`;
+    }
+
+    $('job-detail-content').innerHTML = html;
+  } catch (e) { $('job-detail-content').innerHTML = '<div class="empty">Error loading job</div>'; }
+}
+
+function closeJobDetail() { $('jobs-main').classList.remove('hidden'); $('jobs-detail').classList.remove('active'); }
+
+async function startJob(id) {
+  try { await api('/jobs/' + id + '/start', { method: 'POST' }); toast('Job started!'); openJobDetail(id); } catch (e) { toast('Error'); }
+}
+
+async function completeJob(id) {
+  const hours = $('complete-hours')?.value;
+  try {
+    const res = await api('/jobs/' + id + '/complete', { method: 'POST', body: JSON.stringify({ labor_hours: hours || null }) });
+    toast('Job completed! Invoice #' + res.invoice.invoice_number + ' created'); openJobDetail(id);
+  } catch (e) { toast('Error: ' + e.message); }
+}
+
+async function doUploadJobPhoto(jid, input) {
+  if (!input.files[0]) return;
+  const fd = new FormData();
+  fd.append('photo', input.files[0]);
+  fd.append('phase', input.dataset.phase || 'other');
+  try {
+    await fetch(API + '/photos/jobs/' + jid, { method: 'POST', headers: { 'Authorization': 'Bearer ' + TOKEN }, body: fd });
+    toast('Photo uploaded!'); openJobDetail(jid);
+  } catch (e) { toast('Upload failed'); }
+  input.value = '';
+}
+
+async function addJobChemical(jobId) {
+  const name = prompt('Chemical name:');
+  if (!name) return;
+  const qty = prompt('Quantity:', '1');
+  const sell = prompt('Sell price per unit ($):', '0');
+  try {
+    await api('/jobs/' + jobId + '/chemicals', { method: 'POST', body: JSON.stringify({ chemical_name: name, quantity: parseFloat(qty) || 1, sell_price: parseFloat(sell) || 0 }) });
+    toast('Chemical added!'); openJobDetail(jobId);
+  } catch (e) { toast('Error'); }
+}
+
+async function addJobPart(jobId) {
+  const name = prompt('Part name:');
+  if (!name) return;
+  const qty = prompt('Quantity:', '1');
+  const sell = prompt('Sell price each ($):', '0');
+  const source = prompt('Source (truck/ordered/manual):', 'truck');
+  try {
+    await api('/jobs/' + jobId + '/parts', { method: 'POST', body: JSON.stringify({ part_name: name, quantity: parseInt(qty) || 1, sell_each: parseFloat(sell) || 0, source: source || 'truck' }) });
+    toast('Part added!'); openJobDetail(jobId);
+  } catch (e) { toast('Error'); }
+}
+
+// ═══ INVOICES ═══
+async function loadInvoices() {
+  try {
+    const status = $('inv-filter-status').value;
+    const params = status ? '?status=' + status : '';
+    const invoices = await api('/invoices' + params);
+    if (invoices.length === 0) { $('invoices-list').innerHTML = '<div class="empty"><div class="empty-icon">📄</div>No invoices</div>'; return; }
+    $('invoices-list').innerHTML = invoices.map(i => `
+      <div class="card" onclick="openInvoiceDetail(${i.id})" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:700">${i.invoice_number}</div><div class="card-sub">${esc(i.customer_name || '')} · ${fmtDate(i.created_at)}</div></div>
+        <div style="text-align:right"><div style="font-weight:700;font-size:1rem">${fmt$(i.total)}</div><span class="badge badge-${i.status}">${i.status}</span>
+        ${i.balance_due > 0 ? '<div style="font-size:0.75rem;color:#c0392b">Due: ' + fmt$(i.balance_due) + '</div>' : ''}</div>
+      </div>`).join('');
+  } catch (e) { $('invoices-list').innerHTML = '<div class="empty">Error loading invoices</div>'; }
+}
+
+async function openInvoiceDetail(id) {
+  if (currentTab !== 'invoices') showTab('invoices');
+  $('invoices-main').classList.add('hidden'); $('invoices-detail').classList.add('active');
+  $('invoice-detail-content').innerHTML = '<div class="loading">Loading...</div>';
+  try {
+    const inv = await api('/invoices/' + id);
+    let html = `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div><div class="card-title" style="font-size:1.2rem">${inv.invoice_number}</div>
+          <div class="card-sub">${esc(inv.customer_name || '')} · Due ${fmtDate(inv.due_date)}</div></div>
+          <span class="badge badge-${inv.status}" style="font-size:0.85rem">${inv.status}</span>
+        </div>
+        ${inv.customer_address ? '<div style="font-size:0.82rem;color:#666;margin-top:4px">' + esc(inv.customer_address) + '</div>' : ''}
+      </div>`;
+
+    // Line items
+    html += '<div class="card"><div class="section-row"><h2 style="font-size:0.85rem">Line Items</h2><button class="btn btn-sm btn-primary" onclick="openLineItemModal(' + id + ')">+ Add</button></div>';
+    if (inv.line_items.length > 0) {
+      html += '<table class="data-table"><thead><tr><th>Description</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead><tbody>';
+      inv.line_items.forEach(li => { html += `<tr><td>${esc(li.description)}</td><td>${li.quantity}</td><td>${fmt$(li.unit_price)}</td><td style="font-weight:600">${fmt$(li.line_total)}</td></tr>`; });
+      html += '</tbody></table>';
+    }
+    html += `<div style="border-top:2px solid #e0e0e0;margin-top:8px;padding-top:8px">
+      <div style="display:flex;justify-content:space-between;font-size:0.85rem"><span>Subtotal</span><span>${fmt$(inv.subtotal)}</span></div>
+      ${inv.tax_amount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#666"><span>Tax (' + inv.tax_rate + '%)</span><span>' + fmt$(inv.tax_amount) + '</span></div>' : ''}
+      <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:700;margin-top:4px"><span>Total</span><span>${fmt$(inv.total)}</span></div>
+      ${inv.amount_paid > 0 ? '<div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#27ae60"><span>Paid</span><span>-' + fmt$(inv.amount_paid) + '</span></div>' : ''}
+      ${inv.balance_due > 0 ? '<div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;color:#c0392b;margin-top:4px"><span>Balance Due</span><span>' + fmt$(inv.balance_due) + '</span></div>' : ''}
+    </div></div>`;
+
+    // Actions
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">';
+    if (inv.status === 'draft') html += `<button class="btn btn-primary" onclick="sendInvoice(${id})">📧 Mark Sent</button>`;
+    if (inv.balance_due > 0) html += `<button class="btn btn-success" onclick="openPaymentModal(${id}, ${inv.balance_due})">💰 Record Payment</button>`;
+    html += '</div>';
+
+    // Payments
+    if (inv.payments.length > 0) {
+      html += '<div class="section-row" style="margin-top:16px"><h2>Payments</h2></div>';
+      inv.payments.forEach(p => {
+        html += `<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-weight:600">${p.method}</div><div class="card-sub">${fmtDate(p.payment_date)} ${p.reference_note ? '· ' + esc(p.reference_note) : ''}</div></div>
+          <div style="font-weight:700;color:#27ae60">${fmt$(p.amount)}</div></div>`;
+      });
+    }
+
+    $('invoice-detail-content').innerHTML = html;
+  } catch (e) { $('invoice-detail-content').innerHTML = '<div class="empty">Error loading invoice</div>'; }
+}
+
+function closeInvoiceDetail() { $('invoices-main').classList.remove('hidden'); $('invoices-detail').classList.remove('active'); }
+
+async function sendInvoice(id) {
+  try { await api('/invoices/' + id + '/send', { method: 'POST' }); toast('Invoice marked as sent!'); openInvoiceDetail(id); } catch (e) { toast('Error'); }
+}
+
+function openLineItemModal(invId) { $('li-inv-id').value = invId; $('li-desc').value = ''; $('li-qty').value = '1'; $('li-price').value = ''; openModal('lineitem-modal'); }
+async function saveLineItem() {
+  const body = { description: $('li-desc').value, quantity: parseFloat($('li-qty').value) || 1, unit_price: parseFloat($('li-price').value) || 0, item_type: $('li-type').value };
+  if (!body.description) return toast('Description required');
+  try {
+    await api('/invoices/' + $('li-inv-id').value + '/items', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('lineitem-modal'); toast('Line item added!'); openInvoiceDetail(parseInt($('li-inv-id').value));
+  } catch (e) { toast('Error'); }
+}
+
+function openPaymentModal(invId, balance) { $('pay-inv-id').value = invId; $('pay-amount').value = balance; $('pay-note').value = ''; openModal('payment-modal'); }
+async function savePayment() {
+  const body = { amount: parseFloat($('pay-amount').value), method: $('pay-method').value, reference_note: $('pay-note').value };
+  if (!body.amount) return toast('Amount required');
+  try {
+    await api('/invoices/' + $('pay-inv-id').value + '/payments', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('payment-modal'); toast('Payment recorded!'); openInvoiceDetail(parseInt($('pay-inv-id').value));
+  } catch (e) { toast('Error'); }
+}
+
+// ═══ INVENTORY ═══
+function setInvView(view) {
+  $('inv-parts-view').style.display = view === 'parts' ? 'block' : 'none';
+  $('inv-chemicals-view').style.display = view === 'chemicals' ? 'block' : 'none';
+  $('iv-parts').style.background = view === 'parts' ? '#1a5fa8' : ''; $('iv-parts').style.color = view === 'parts' ? 'white' : '';
+  $('iv-chemicals').style.background = view === 'chemicals' ? '#1a5fa8' : ''; $('iv-chemicals').style.color = view === 'chemicals' ? 'white' : '';
+}
+setInvView('parts');
+
+async function loadParts() {
+  try {
+    const parts = await api('/inventory');
+    if (parts.length === 0) { $('parts-list').innerHTML = '<div class="empty"><div class="empty-icon">🔧</div>No parts in truck stock</div>'; return; }
+    $('parts-list').innerHTML = parts.map(p => `
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:600">${esc(p.name)}</div><div class="card-sub">${esc(p.category || '-')} · Cost: ${fmt$(p.cost_price)} · Sell: ${fmt$(p.sell_price)}</div></div>
+        <div style="text-align:center"><div style="font-size:1.1rem;font-weight:700;${p.quantity_on_hand <= p.reorder_level ? 'color:#c0392b' : 'color:#1a5fa8'}">${p.quantity_on_hand}</div>
+        <div style="font-size:0.65rem;color:#888">on hand</div>
+        <button class="btn btn-sm btn-ghost" style="margin-top:4px" onclick="restockPart(${p.id})">+ Restock</button></div>
+      </div>`).join('');
+  } catch (e) { $('parts-list').innerHTML = '<div class="empty">Error loading parts</div>'; }
+}
+
+async function savePart() {
+  const id = $('part-id').value;
+  const body = { name: $('pt-name').value, category: $('pt-category').value, unit: $('pt-unit').value, quantity_on_hand: parseInt($('pt-qty').value) || 0, reorder_level: parseInt($('pt-reorder').value) || 2, cost_price: parseFloat($('pt-cost').value) || 0, sell_price: parseFloat($('pt-sell').value) || 0, notes: $('pt-notes').value };
+  if (!body.name) return toast('Part name required');
+  try {
+    if (id) await api('/inventory/' + id, { method: 'PUT', body: JSON.stringify(body) });
+    else await api('/inventory', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('part-modal'); toast('Part saved!'); loadParts();
+    ['part-id','pt-name','pt-notes'].forEach(f => $(f).value = '');
+  } catch (e) { toast('Error: ' + e.message); }
+}
+
+async function restockPart(id) {
+  const qty = prompt('Restock quantity:');
+  if (!qty) return;
+  try { await api('/inventory/' + id + '/restock', { method: 'POST', body: JSON.stringify({ quantity: parseInt(qty) }) }); toast('Restocked!'); loadParts(); } catch (e) { toast('Error'); }
+}
+
+async function loadChemicals() {
+  try {
+    const chems = await api('/inventory/chemicals');
+    if (chems.length === 0) { $('chemicals-list').innerHTML = '<div class="empty"><div class="empty-icon">🧪</div>No chemicals in catalog</div>'; return; }
+    $('chemicals-list').innerHTML = chems.map(c => `
+      <div class="card"><div style="font-weight:600">${esc(c.name)}</div>
+      <div class="card-sub">${esc(c.category || '-')} · ${c.unit} · Cost: ${fmt$(c.cost_per_unit)} · Sell: ${fmt$(c.sell_per_unit)}</div></div>`).join('');
+  } catch (e) { $('chemicals-list').innerHTML = '<div class="empty">Error loading chemicals</div>'; }
+}
+
+async function saveChemical() {
+  const body = { name: $('ch-name').value, category: $('ch-category').value, unit: $('ch-unit').value, cost_per_unit: parseFloat($('ch-cost').value) || 0, sell_per_unit: parseFloat($('ch-sell').value) || 0 };
+  if (!body.name) return toast('Chemical name required');
+  try {
+    await api('/inventory/chemicals', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('chemical-modal'); toast('Chemical added!'); loadChemicals();
+  } catch (e) { toast('Error'); }
+}
+
+// ═══ REPORTS ═══
+function setReportView(view) {
+  $('report-revenue-view').style.display = view === 'revenue' ? 'block' : 'none';
+  $('report-aging-view').style.display = view === 'aging' ? 'block' : 'none';
+  $('rv-revenue').style.background = view === 'revenue' ? '#1a5fa8' : ''; $('rv-revenue').style.color = view === 'revenue' ? 'white' : '';
+  $('rv-aging').style.background = view === 'aging' ? '#1a5fa8' : ''; $('rv-aging').style.color = view === 'aging' ? 'white' : '';
+  if (view === 'aging') loadAging();
+}
+setReportView('revenue');
+
+function initReportYears() {
+  const sel = $('report-year');
+  if (sel.options.length > 0) return;
+  const y = new Date().getFullYear();
+  for (let i = y; i >= y - 3; i--) sel.add(new Option(i, i));
+}
+
+async function loadRevenue() {
+  const year = $('report-year').value;
+  try {
+    const r = await api('/reports/revenue?year=' + year);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    let html = `<div class="dash-grid"><div class="dash-tile"><div class="dt-val green">${fmt$(r.total)}</div><div class="dt-label">Total Revenue ${year}</div></div></div>`;
+
+    // By month
+    html += '<div class="card"><div style="font-weight:700;margin-bottom:8px">Revenue by Month</div>';
+    const maxMonth = Math.max(...r.by_month.map(m => parseFloat(m.total)), 1);
+    months.forEach((m, i) => {
+      const row = r.by_month.find(x => parseInt(x.month) === i + 1);
+      const total = row ? parseFloat(row.total) : 0;
+      const pct = (total / maxMonth * 100).toFixed(0);
+      html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:0.82rem">
+        <div style="width:32px;font-weight:600">${m}</div>
+        <div style="flex:1;height:8px;background:#e8edf3;border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#1a5fa8;border-radius:4px"></div></div>
+        <div style="width:70px;text-align:right;font-weight:600">${fmt$(total)}</div></div>`;
+    });
+    html += '</div>';
+
+    // By type
+    if (r.by_job_type.length > 0) {
+      html += '<div class="card"><div style="font-weight:700;margin-bottom:8px">Revenue by Job Type</div>';
+      r.by_job_type.forEach(t => { html += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.85rem"><span style="text-transform:capitalize">${t.job_type}</span><span style="font-weight:600">${fmt$(t.total)}</span></div>`; });
+      html += '</div>';
+    }
+
+    // By customer
+    if (r.by_customer.length > 0) {
+      html += '<div class="card"><div style="font-weight:700;margin-bottom:8px">Top Customers</div>';
+      r.by_customer.forEach(c => { html += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.85rem"><span>${esc(c.name)}</span><span style="font-weight:600">${fmt$(c.total)}</span></div>`; });
+      html += '</div>';
+    }
+
+    html += `<button class="btn btn-ghost btn-full" onclick="window.open('/api/reports/export/invoices?year=${year}')">⬇ Export Invoices CSV</button>`;
+
+    $('revenue-content').innerHTML = html;
+  } catch (e) { $('revenue-content').innerHTML = '<div class="empty">Error loading report</div>'; }
+}
+
+async function loadAging() {
+  try {
+    const a = await api('/reports/aging');
+    let html = `<div class="dash-grid">
+      <div class="dash-tile"><div class="dt-val">${fmt$(a.current.total)}</div><div class="dt-label">Current</div></div>
+      <div class="dash-tile"><div class="dt-val amber">${fmt$(a.over_30.total)}</div><div class="dt-label">30+ Days</div></div>
+      <div class="dash-tile"><div class="dt-val red">${fmt$(a.over_60.total)}</div><div class="dt-label">60+ Days</div></div>
+      <div class="dash-tile"><div class="dt-val red">${fmt$(a.over_90.total)}</div><div class="dt-label">90+ Days</div></div>
+    </div>
+    <div class="card"><div style="font-size:1.05rem;font-weight:700;color:#c0392b">Total Outstanding: ${fmt$(a.grand_total)}</div></div>`;
+
+    const renderSection = (title, items) => {
+      if (items.length === 0) return '';
+      let s = `<div style="margin-top:12px;font-weight:700;font-size:0.85rem;color:#555;margin-bottom:6px">${title}</div>`;
+      items.forEach(i => {
+        s += `<div class="card" onclick="openInvoiceDetail(${i.id})" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-weight:600">${i.invoice_number}</div><div class="card-sub">${esc(i.customer_name)} · Due ${fmtDate(i.due_date)}</div></div>
+          <div style="font-weight:700;color:#c0392b">${fmt$(i.balance_due)}</div></div>`;
+      });
+      return s;
+    };
+
+    html += renderSection('Current', a.current.invoices);
+    html += renderSection('1-30 Days Overdue', a.over_30.invoices);
+    html += renderSection('31-60 Days Overdue', a.over_60.invoices);
+    html += renderSection('90+ Days Overdue', a.over_90.invoices);
+
+    $('aging-content').innerHTML = html;
+  } catch (e) { $('aging-content').innerHTML = '<div class="empty">Error loading aging report</div>'; }
+}
+
+// ═══ SETTINGS ═══
+async function loadSettings() {
+  try {
+    const s = await api('/settings');
+    $('set-company').value = s.company_name || 'Freedom Pools Tennessee';
+    $('set-phone').value = s.company_phone || '';
+    $('set-email').value = s.company_email || '';
+    $('set-tax').value = s.default_tax_rate || '';
+
+    const aiCheck = await api('/settings/check/anthropic_api_key');
+    $('ai-key-status').innerHTML = aiCheck.configured ? '<span style="color:#27ae60;font-weight:600">✓ API key configured</span>' : '<span style="color:#c0392b;font-weight:600">✗ Not configured</span>';
+
+    const stripeCheck = await api('/settings/check/stripe_secret_key');
+    $('stripe-key-status').innerHTML = stripeCheck.configured ? '<span style="color:#27ae60;font-weight:600">✓ Stripe connected</span>' : '<span style="color:#c0392b;font-weight:600">✗ Not connected</span>';
+  } catch (e) {}
+}
+
+async function saveCompanySettings() {
+  try {
+    await api('/settings/company_name', { method: 'PUT', body: JSON.stringify({ value: $('set-company').value }) });
+    await api('/settings/company_phone', { method: 'PUT', body: JSON.stringify({ value: $('set-phone').value }) });
+    await api('/settings/company_email', { method: 'PUT', body: JSON.stringify({ value: $('set-email').value }) });
+    if ($('set-tax').value) await api('/settings/default_tax_rate', { method: 'PUT', body: JSON.stringify({ value: $('set-tax').value }) });
+    toast('Settings saved!');
+  } catch (e) { toast('Error saving settings'); }
+}
+
+async function saveAiKey() {
+  const key = $('set-ai-key').value;
+  if (!key) return toast('Enter API key');
+  try { await api('/settings/anthropic_api_key', { method: 'PUT', body: JSON.stringify({ value: key }) }); toast('AI key saved!'); $('set-ai-key').value = ''; loadSettings(); } catch (e) { toast('Error'); }
+}
+
+async function saveStripeKeys() {
+  try {
+    if ($('set-stripe-key').value) await api('/settings/stripe_secret_key', { method: 'PUT', body: JSON.stringify({ value: $('set-stripe-key').value }) });
+    if ($('set-stripe-wh').value) await api('/settings/stripe_webhook_secret', { method: 'PUT', body: JSON.stringify({ value: $('set-stripe-wh').value }) });
+    toast('Stripe keys saved!'); $('set-stripe-key').value = ''; $('set-stripe-wh').value = ''; loadSettings();
+  } catch (e) { toast('Error'); }
+}
+
+async function changePassword() {
+  const cur = $('set-cur-pass').value, nw = $('set-new-pass').value;
+  if (!cur || !nw) return toast('Fill in both fields');
+  try { await api('/auth/change-password', { method: 'POST', body: JSON.stringify({ current_password: cur, new_password: nw }) }); toast('Password updated!'); $('set-cur-pass').value = ''; $('set-new-pass').value = ''; } catch (e) { toast('Error: ' + e.message); }
+}
+
+// ═══ USERS ═══
+async function loadUsers() {
+  try {
+    const users = await api('/users');
+    $('users-list').innerHTML = users.map(u => `
+      <div class="item-row">
+        <div style="flex:1"><div style="font-weight:600">${esc(u.full_name || u.username)}</div><div style="font-size:0.78rem;color:#888">${u.username} · ${u.role} ${!u.is_active ? '(inactive)' : ''}</div></div>
+      </div>`).join('');
+  } catch (e) {}
+}
+
+async function saveUser() {
+  const body = { username: $('u-username').value, password: $('u-password').value, full_name: $('u-fullname').value, role: $('u-role').value, phone: $('u-phone').value, email: $('u-email').value };
+  if (!body.username || !body.password) return toast('Username and password required');
+  try {
+    await api('/users', { method: 'POST', body: JSON.stringify(body) });
+    closeModal('user-modal'); toast('User created!'); loadUsers();
+    ['u-username','u-password','u-fullname','u-phone','u-email'].forEach(f => $(f).value = '');
+  } catch (e) { toast('Error: ' + e.message); }
+}
+
+// ═══ LIGHTBOX ═══
+function openLightbox(src) { $('lb-img').src = src; $('lightbox').classList.add('open'); }
+function closeLightbox() { $('lightbox').classList.remove('open'); }
+$('lightbox').addEventListener('click', e => { if (e.target === $('lightbox')) closeLightbox(); });
+
+// ═══ UTIL ═══
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+</script>
+</body>
+</html>

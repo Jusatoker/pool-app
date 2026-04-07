@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: poolapp
+      POSTGRES_USER: pool
+      POSTGRES_PASSWORD: poolpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5433:5432"
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://pool:poolpassword@db:5432/poolapp
+      PORT: 3002
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - "3002:3002"
+
+volumes:
+  pgdata:
+  uploads:
